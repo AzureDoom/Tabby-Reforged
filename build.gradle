@@ -1,0 +1,114 @@
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id "com.modrinth.minotaur" version "2.+"
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+}
+
+version = project.mod_version
+group = project.mod_group_id
+archivesBaseName = project.archivesBaseName
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+minecraft {
+    mappings channel: project.mapping_channel, version: project.mapping_version
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'tabby'
+            taskName 'tabby-forge1194_client'
+            mods {
+                tabby {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'debug'
+            property 'forge.enabledGameTestNamespaces', 'tabby'
+            taskName 'tabby-forge1194_server'
+            mods {
+                tabby {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${neo_version}"
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : "tabby",
+                "Specification-Vendor"    : "corgiblu",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : "corgiblu",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+mixin {
+    add sourceSets.main, "tabby.refmap.json"
+    config "tabby.mixins.json"
+}
+
+if (file('key.properties').exists()) {
+    curseforge {
+        def curseProp = new Properties()
+        File secretPropsFile = file("key.properties")
+        curseProp.load(secretPropsFile.newInputStream())
+
+        project {
+            apiKey = curseProp.getProperty('curseKey')
+            id = "rQAFxEc8"
+            releaseType = "release"
+            changelogType = 'text'
+            changelog = file('changelog.txt')
+        	addGameVersion("1.19.4")
+            addGameVersion("Forge")
+            addGameVersion("Java 17")
+        }
+    }
+}
+
+if (file('key.properties').exists()) {
+	modrinth {
+		def modrinthProp = new Properties()
+		File secretPropsFile = file("key.properties")
+		modrinthProp.load(secretPropsFile.newInputStream())
+		
+		token = modrinthProp.getProperty('modrinthKey')
+		projectId = '7zlUOZvb' 
+		versionNumber = project.mod_version 
+		uploadFile = jar 
+		changelog = rootProject.file("changelog.txt").text
+		gameVersions = ['1.19.4']
+		loaders = ['forge']
+	}
+}

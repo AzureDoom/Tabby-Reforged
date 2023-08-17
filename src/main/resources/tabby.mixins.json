@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "mod.azure.tabby.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+  ],
+  "client": [
+    "TabSizeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
