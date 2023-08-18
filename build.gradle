@@ -104,7 +104,7 @@ if (file('key.properties').exists()) {
 		modrinthProp.load(secretPropsFile.newInputStream())
 		
 		token = modrinthProp.getProperty('modrinthKey')
-		projectId = '7zlUOZvb' 
+		projectId = 'rQAFxEc8' 
 		versionNumber = project.mod_version 
 		uploadFile = jar 
 		changelog = rootProject.file("changelog.txt").text
