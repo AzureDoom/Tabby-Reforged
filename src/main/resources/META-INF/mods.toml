@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[45,)"
+loaderVersion="[43,)"
 license="MIT"
 [[mods]]
 modId="tabby"
@@ -13,12 +13,12 @@ Alter the maximum amount of players and rows that can be displayed on the player
 [[dependencies.tabby]]
     modId="forge"
     mandatory=true
-    versionRange="[45,)"
+    versionRange="[43.2,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.tabby]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.4,1.20)"
+    versionRange="[1.19.2,1.19.3)"
     ordering="NONE"
     side="BOTH"

@@ -16,13 +16,14 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: project.mapping_channel, version: project.mapping_version
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
             workingDirectory project.file('run')
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'tabby'
-            taskName 'tabby-forge1194_client'
+            taskName 'tabby-forge1192_client'
             mods {
                 tabby {
                     source sourceSets.main
@@ -34,7 +35,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', 'tabby'
-            taskName 'tabby-forge1194_server'
+            taskName 'tabby-forge1192_server'
             mods {
                 tabby {
                     source sourceSets.main
@@ -91,7 +92,7 @@ if (file('key.properties').exists()) {
             releaseType = "release"
             changelogType = 'text'
             changelog = file('changelog.txt')
-        	addGameVersion("1.19.4")
+        	addGameVersion("1.19.2")
             addGameVersion("Forge")
             addGameVersion("Java 17")
         }
@@ -109,7 +110,7 @@ if (file('key.properties').exists()) {
 		versionNumber = project.mod_version 
 		uploadFile = jar 
 		changelog = rootProject.file("changelog.txt").text
-		gameVersions = ['1.19.4']
+		gameVersions = ['1.19.2']
 		loaders = ['forge']
 	}
 }
