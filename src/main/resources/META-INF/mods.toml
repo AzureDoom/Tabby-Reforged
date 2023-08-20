@@ -1,24 +1,22 @@
 modLoader="javafml"
-loaderVersion="[45,)"
-license="MIT"
-[[mods]]
-modId="tabby"
-version="${file.jarVersion}"
-displayName="Tabby Reforged"
-#logoFile="logo.png"
-authors="AzureDoomC, Fruitloopins"
-description='''
-Alter the maximum amount of players and rows that can be displayed on the player list
-'''
-[[dependencies.tabby]]
-    modId="forge"
-    mandatory=true
-    versionRange="[45,)"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+[[mods]] 
+modId="${mod_id}" 
+version="${mod_version}"
+displayName="${mod_name}" 
+#logoFile="icon.png" 
+authors="${mod_authors}"
+description='''${mod_description}'''
+[[dependencies.${mod_id}]]
+    modId="forge" 
+    mandatory=true 
+    versionRange="${neo_version_range}"
     ordering="NONE"
     side="BOTH"
-[[dependencies.tabby]]
+[[dependencies.${mod_id}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.4,1.20)"
+    versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"

@@ -1,7 +1,7 @@
 plugins {
     id 'eclipse'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.neoforged.gradle' version '[6.0.18,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
     id "com.modrinth.minotaur" version "2.+"
     id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -16,30 +16,31 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: project.mapping_channel, version: project.mapping_version
+    copyIdeResources = true
+    generateRunFolders = true
 
     runs {
-        client {
-            workingDirectory project.file('run')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'tabby'
-            taskName 'tabby-forge1194_client'
+        configureEach {
+            workingDirectory project.file("run/${it.name}")
+            properties 'mixin.env.remapRefMap': 'true'
+            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
+            arg "-mixin.config=tabby.mixins.json"
             mods {
-                tabby {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
         }
 
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
+            taskName 'tabby-forge-1.20_client'
+        }
+
         server {
-            workingDirectory project.file('run')
-            property 'forge.logging.console.level', 'debug'
-            property 'forge.enabledGameTestNamespaces', 'tabby'
-            taskName 'tabby-forge1194_server'
-            mods {
-                tabby {
-                    source sourceSets.main
-                }
-            }
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
+            taskName 'tabby-forge-1.20_server'
         }
     }
 }
@@ -50,27 +51,38 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${neo_version}"
+    minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
-jar {
-    manifest {
-        attributes([
-                "Specification-Title"     : "tabby",
-                "Specification-Vendor"    : "corgiblu",
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : project.name,
-                "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "corgiblu",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+            neo_version         : neo_version, neo_version_range: neo_version_range,
+            loader_version_range: loader_version_range,
+            mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+            mod_authors         : mod_authors, mod_description: mod_description, pack_format_number: pack_format_number,
+    ]
+    inputs.properties replaceProperties
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
     }
 }
 
-jar.finalizedBy('reobfJar')
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'     : mod_id,
+                'Specification-Vendor'    : "AzureDoom",
+                'Specification-Version'   : '1', // We are version 1 of ourselves
+                'Implementation-Title'    : project.name,
+                'Implementation-Version'  : project.jar.archiveVersion,
+                'Implementation-Vendor'   : "AzureDoom",
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+    finalizedBy 'reobfJar'
 }
 
 mixin {
@@ -86,12 +98,13 @@ if (file('key.properties').exists()) {
 
         project {
             apiKey = curseProp.getProperty('curseKey')
-            id = "rQAFxEc8"
+            id = "903935"
             releaseType = "release"
             changelogType = 'text'
             changelog = file('changelog.txt')
-        	addGameVersion("1.19.4")
+        	addGameVersion("1.20.1")
             addGameVersion("Forge")
+            addGameVersion("NeoForge")
             addGameVersion("Java 17")
         }
     }
@@ -104,11 +117,11 @@ if (file('key.properties').exists()) {
 		modrinthProp.load(secretPropsFile.newInputStream())
 		
 		token = modrinthProp.getProperty('modrinthKey')
-		projectId = '7zlUOZvb' 
+		projectId = 'rQAFxEc8' 
 		versionNumber = project.mod_version 
 		uploadFile = jar 
 		changelog = rootProject.file("changelog.txt").text
-		gameVersions = ['1.19.4']
-		loaders = ['forge']
+		gameVersions = ['1.20.1']
+		loaders = ['forge', 'neoforge']
 	}
 }
