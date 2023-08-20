@@ -51,6 +51,7 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${neo_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 }
 
 jar {
